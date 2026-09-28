@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经纬 · Warp &amp; Weft</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { --paper: #ece4d6; --ink: #1d1915; --red: #c8261d; --mute: #7d7267; }
+  html, body { margin: 0; height: 100%; background: #16130f; color: var(--paper); font: 13px/1.4 "IBM Plex Mono", ui-monospace, monospace; }
+  main { min-height: 100%; display: grid; place-items: center; padding: 16px; box-sizing: border-box; }
+  .frame { width: min(100%, calc((100vh - 96px) * 16 / 9)); }
+  canvas { width: 100%; aspect-ratio: 16 / 9; display: block; background: var(--paper); cursor: pointer; }
+  .bar { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+  button { font: inherit; color: var(--paper); background: none; border: 1px solid #4a4239; padding: 6px 12px; cursor: pointer; }
+  button:hover { border-color: var(--red); }
+  input[type=range] { flex: 1; accent-color: var(--red); }
+  .t { min-width: 7ch; text-align: right; color: var(--mute); }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame">
+    <canvas id="c" width="1920" height="1080" aria-label="经纬 · Warp & Weft — National Day 2026"></canvas>
+    <audio id="audio" preload="auto">
+      <source src="../dist/soundtrack.webm" type='audio/webm; codecs="opus"'>
+      <source src="../dist/soundtrack.m4a" type="audio/mp4">
+    </audio>
+    <div class="bar">
+      <button id="play">▶ PLAY</button>
+      <input id="seek" type="range" min="0" max="30" step="0.001" value="0" aria-label="Seek">
+      <span class="t" id="time">00.00</span>
+    </div>
+  </div>
+</main>
+<script type="module">
+  import { createCanvas, Path2DCtor, loadFonts } from '../src/env-browser.js';
+  import { createScene } from '../src/scene.js';
+  import { DURATION } from '../src/core/time.js';
+
+  await loadFonts();
+  const scene = createScene({ createCanvas, Path2D: Path2DCtor });
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const audio = document.getElementById('audio');
+  const seek = document.getElementById('seek');
+  const play = document.getElementById('play');
+  const label = document.getElementById('time');
+  let scrubT = 0;
+
+  const draw = (t) => {
+    scene.render(ctx, t);
+    label.textContent = t.toFixed(2).padStart(5, '0');
+    seek.value = t;
+  };
+  const loop = () => {
+    const t = audio.paused ? scrubT : audio.currentTime;
+    draw(Math.min(t, DURATION - 1e-3));
+    requestAnimationFrame(loop);
+  };
+  const toggle = () => {
+    if (audio.paused) {
+      if (audio.ended || audio.currentTime >= DURATION - 0.05) audio.currentTime = 0;
+      audio.play();
+      play.textContent = '❚❚ PAUSE';
+    } else {
+      audio.pause();
+      scrubT = audio.currentTime;
+      play.textContent = '▶ PLAY';
+    }
+  };
+  play.onclick = toggle;
+  canvas.onclick = toggle;
+  audio.onended = () => { play.textContent = '▶ PLAY'; scrubT = DURATION - 1e-3; };
+  seek.oninput = () => { scrubT = Number(seek.value); audio.currentTime = scrubT; };
+  addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); toggle(); } });
+  loop();
+</script>
+</body>
+</html>
