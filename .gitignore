@@ -3,3 +3,4 @@ out/
 *.log
 films/*/out/
 films/tongxin/out/
+films/*/dist/preview_*.mp4
