@@ -142,6 +142,25 @@ export class Ribbon {
     const visible = t >= o.born && (o.dies === undefined || t < o.dies);
     this.mesh.visible = visible;
     if (!visible) return;
+    const n = o.segments;
+    const L = o.length;
+    const pts = this._pts || (this._pts = new Float64Array((n + 1) * 3));
+    if (o.curve) {
+      // Parametric ribbon: the caller gives the whole centreline (u = 0 head → 1 tail).
+      for (let i = 0; i <= n; i++) {
+        const p = o.curve(i / n, t);
+        pts[i * 3] = p[0];
+        pts[i * 3 + 1] = p[1];
+        pts[i * 3 + 2] = p[2];
+      }
+    } else this._trail(t, pts);
+    this._strip(t, pts, up);
+  }
+
+  _trail(t, pts) {
+    const o = this.o;
+    const n = o.segments;
+    const L = o.length;
     // 1. Sample the head's history back from t.
     const K = this.K;
     let cum = 0;
@@ -162,9 +181,6 @@ export class Ribbon {
     }
     const last = Math.min(k, K);
     // 2. Resample at even arc length; bunch at the anchor if history is short.
-    const n = o.segments;
-    const L = o.length;
-    const pts = this._pts || (this._pts = new Float64Array((n + 1) * 3));
     let j = 0;
     for (let i = 0; i <= n; i++) {
       const s = (i / n) * L;
@@ -191,6 +207,12 @@ export class Ribbon {
       pts[i * 3 + 1] = y;
       pts[i * 3 + 2] = z;
     }
+  }
+
+  _strip(t, pts, up) {
+    const o = this.o;
+    const n = o.segments;
+    const L = o.length;
     // 3. Frames, waves, twist, and the strip itself.
     const wv = { amp: 0.18, len: 2.6, freq: 1.3, ...(o.wave || {}) };
     const tw = { base: 0, perLen: 0.9, amp: 1.1, len: 3.2, freq: 0.9, ...(o.twist || {}) };

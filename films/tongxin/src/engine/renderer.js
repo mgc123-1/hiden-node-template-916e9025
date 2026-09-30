@@ -76,16 +76,31 @@ export function createRenderer(canvas, W, H) {
   dofScene.add(new THREE.Mesh(quadGeo, dofMat));
 
   const outMat = new THREE.ShaderMaterial({
-    uniforms: { tSrc: { value: rtAcc.texture }, uVignette: { value: 0.16 }, uLift: { value: 0 }, uGain: { value: 1 } },
+    uniforms: { tSrc: { value: rtAcc.texture }, uVignette: { value: 0.16 }, uLift: { value: 0 }, uGain: { value: 1 }, uFrame: { value: new THREE.Vector3(1, 0, 0) }, uMat: { value: new THREE.Color('#e9e1d2') } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
     fragmentShader: `
       uniform sampler2D tSrc; uniform float uVignette; uniform float uLift; uniform float uGain;
+      uniform vec3 uFrame; uniform vec3 uMat;
       varying vec2 vUv;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
       void main() {
-        vec3 c = texture2D(tSrc, vUv).rgb * uGain;
-        vec2 d = (vUv - 0.5) * vec2(1.0, 0.72);
+        // The picture can be mounted on a paper mat: scale uFrame.x, offset uFrame.yz.
+        vec2 uv = (vUv - 0.5 - uFrame.yz) / uFrame.x + 0.5;
+        vec3 c = texture2D(tSrc, clamp(uv, 0.0, 1.0)).rgb * uGain;
+        vec2 d = (uv - 0.5) * vec2(1.0, 0.72);
         c *= 1.0 - uVignette * smoothstep(0.18, 0.62, length(d));
         c = mix(c, vec3(1.0), uLift);
+        if (uFrame.x < 0.9999) {
+          vec2 px = gl_FragCoord.xy;
+          float fib = hash(floor(px / 2.0)) * 0.035 + hash(floor(px / 9.0 + 3.0)) * 0.03;
+          vec3 mat = uMat * (1.0 - fib);
+          vec2 q = abs(uv - 0.5) - 0.5;
+          float outside = max(q.x * 1.7778, q.y);
+          // A soft contact shadow where the print sits on the mat.
+          float sh = 1.0 - 0.28 * exp(-max(0.0, outside) * 90.0);
+          vec3 m = mat * sh;
+          c = outside > 0.0 ? m : c;
+        }
         gl_FragColor = vec4(c, 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -140,6 +155,7 @@ export function createRenderer(canvas, W, H) {
     outMat.uniforms.uVignette.value = grade.vignette ?? 0.16;
     outMat.uniforms.uLift.value = grade.lift ?? 0;
     outMat.uniforms.uGain.value = grade.gain ?? 1;
+    outMat.uniforms.uFrame.value.set(grade.frame?.[0] ?? 1, grade.frame?.[1] ?? 0, grade.frame?.[2] ?? 0);
     renderer.setRenderTarget(null);
     renderer.render(outScene, quadCam);
     const octx = overlayCanvas.getContext('2d');

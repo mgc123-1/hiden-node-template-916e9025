@@ -8,6 +8,9 @@ import { createTurpan } from './scenes/turpan.js';
 import { createTibet } from './scenes/tibet.js';
 import { createMongol } from './scenes/mongol.js';
 import { createSouth } from './scenes/south.js';
+import { createMontage } from './scenes/montage.js';
+import { createBeijing } from './scenes/beijing.js';
+import { overlay, grade } from './overlay.js';
 
 export function createFilm() {
   const scene = new THREE.Scene();
@@ -22,10 +25,14 @@ export function createFilm() {
   const hemi = new THREE.HemisphereLight('#fff', '#888', 1);
   scene.add(hemi);
   scene.fog = new THREE.Fog('#fff', 50, 300);
+  // A point light that always exists (so shaders never recompile), dark unless a shot lights it.
+  const point = new THREE.PointLight('#ff9a3c', 0, 8, 2);
+  scene.add(point);
 
   const env = {
     scene,
     camera,
+    point,
     light(o) {
       const c = new THREE.Vector3(...(o.shadowCenter ?? [0, 0, 0]));
       const dir = new THREE.Vector3(...o.sun).normalize();
@@ -44,12 +51,13 @@ export function createFilm() {
       scene.fog.near = o.fog[1];
       scene.fog.far = o.fog[2];
       env.exposure = o.exposure ?? 1;
+      point.intensity = 0;
     },
     exposure: 1,
   };
 
   const want = new URLSearchParams(location.search).get('shots');
-  const builders = { turpan: createTurpan, tibet: createTibet, mongol: createMongol, south: createSouth };
+  const builders = { turpan: createTurpan, tibet: createTibet, mongol: createMongol, south: createSouth, montage: createMontage, beijing: createBeijing };
   const shots = [];
   for (const [name, make] of Object.entries(builders)) {
     if (want && !want.split(',').includes(name)) continue;
@@ -70,5 +78,5 @@ export function createFilm() {
     return { scene, camera };
   }
 
-  return { update, env, shots };
+  return { update, env, shots, overlay, grade };
 }

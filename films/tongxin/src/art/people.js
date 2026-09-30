@@ -213,8 +213,77 @@ function drawHat(ctx, s) {
     fill(ctx, '#15110f', (c) => smooth(c, [[-0.2, 0.0], [-0.12, 0.05], [0, 0.07], [0.12, 0.05], [0.2, 0.0], [0, 0.02]], true, 0.4));
     band(ctx, -0.18, 0.18, 0.02, 0.012, '#15110f', '#e9c46a', 'dots');
   } else if (h.kind === 'korean') {
-    fill(ctx, HAIR, (c) => ellipse(c, 0, 0.02, 0.1, 0.03));
-    fill(ctx, '#e9c46a', (c) => poly(c, [[-0.14, 0.0], [0.14, 0.0], [0.14, 0.01], [-0.14, 0.01]]));
+    // Hair drawn smoothly back; a red daenggi bow and a gold pin at the side.
+    fill(ctx, HAIR, (c) => smooth(c, [[-0.1, -0.02], [-0.095, 0.05], [0, 0.075], [0.095, 0.05], [0.1, -0.02], [0, 0.03]], true, 0.4));
+    fill(ctx, '#c1121f', (c) => { poly(c, [[0.1, 0.0], [0.16, 0.04], [0.16, -0.03]]); poly(c, [[0.1, 0.0], [0.13, -0.08], [0.1, -0.1]]); });
+    stroke(ctx, '#e9c46a', 0.007, (c) => { c.moveTo(-0.13, 0.03); c.lineTo(0.02, 0.05); });
+  } else if (h.kind === 'zhuang') {
+    // Folded indigo head-cloth with a woven-brocade front edge and a side tassel.
+    const shape = (c) => smooth(c, [[-0.115, -0.015], [-0.125, 0.07], [-0.06, 0.1], [0.07, 0.1], [0.13, 0.075], [0.118, -0.015]], true, 0.3);
+    fill(ctx, h.base ?? '#1d2b53', shape);
+    clipTo(ctx, shape, () => {
+      band(ctx, -0.14, 0.14, 0.012, 0.03, '#c1121f', '#f4d35e', 'diamond', '#2a9d8f');
+      band(ctx, -0.14, 0.14, 0.04, 0.012, '#f4d35e', '#1d2b53', 'dots');
+    });
+    stroke(ctx, '#c1121f', 0.008, (c) => { c.moveTo(0.12, 0.05); c.lineTo(0.16, -0.12); });
+    for (const k of [0, 1, 2]) fill(ctx, ['#c1121f', '#f4d35e', '#2a9d8f'][k], (c) => ellipse(c, 0.155 + k * 0.012, -0.13 - k * 0.012, 0.012, 0.018));
+  } else if (h.kind === 'hani') {
+    // Indigo cap studded with silver, bead fringe over the brow, wool pompoms.
+    const shape = (c) => smooth(c, [[-0.11, -0.01], [-0.1, 0.08], [0, 0.11], [0.1, 0.08], [0.11, -0.01]], true, 0.4);
+    fill(ctx, '#1b2440', shape);
+    for (let row = 0; row < 3; row++) for (let i = -4; i <= 4; i++) fill(ctx, '#e7eaee', (c) => ellipse(c, i * 0.023 + (row % 2) * 0.011, 0.015 + row * 0.028, 0.007, 0.007));
+    for (let i = -5; i <= 5; i++) stroke(ctx, '#e7eaee', 0.003, (c) => { c.moveTo(i * 0.02, -0.005); c.lineTo(i * 0.02, -0.03 - (i % 2 ? 0.008 : 0)); });
+    for (const [x, y, col] of [[-0.12, 0.05, '#e63946'], [-0.13, 0.0, '#2a9d8f'], [-0.12, -0.05, '#f4d35e'], [0.12, 0.05, '#e63946'], [0.13, 0.0, '#f4a261'], [0.12, -0.05, '#8338ec']]) fill(ctx, col, (c) => ellipse(c, x, y, 0.022, 0.022));
+  } else if (h.kind === 'kazakh') {
+    // Fox-fur brim and a tall crown topped with an owl-feather plume.
+    fill(ctx, '#b0412e', (c) => smooth(c, [[-0.08, 0.05], [-0.06, 0.22], [0, 0.25], [0.06, 0.22], [0.08, 0.05]], true, 0.4));
+    band(ctx, -0.1, 0.1, 0.12, 0.02, '#b0412e', '#f4d35e', 'dots');
+    fill(ctx, '#c98b4a', (c) => smooth(c, [[-0.13, -0.02], [-0.14, 0.06], [-0.1, 0.1], [0.1, 0.1], [0.14, 0.06], [0.13, -0.02], [0, 0.0]], true, 0.4));
+    stroke(ctx, '#8a5a2b', 0.004, (c) => { for (let x = -0.12; x < 0.13; x += 0.018) { c.moveTo(x, 0.0); c.lineTo(x + 0.01, 0.08); } });
+    for (let k = -2; k <= 2; k++) fill(ctx, '#f7f3ea', (c) => ellipse(c, k * 0.012, 0.29 + Math.abs(k) * -0.01, 0.008, 0.05, k * 0.25));
+  } else if (h.kind === 'manchu') {
+    // 两把头: a broad black board on a stem, a great peony, tassels at the side.
+    fill(ctx, '#15110f', (c) => poly(c, [[-0.03, 0.0], [-0.03, 0.14], [0.03, 0.14], [0.03, 0.0]]));
+    fill(ctx, '#15110f', (c) => smooth(c, [[-0.3, 0.13], [-0.31, 0.2], [0.31, 0.2], [0.3, 0.13]], true, 0.2));
+    band(ctx, -0.3, 0.3, 0.165, 0.018, '#15110f', '#d4a24c', 'cloud');
+    for (let p = 0; p < 8; p++) {
+      const a = (p / 8) * Math.PI * 2;
+      fill(ctx, p % 2 ? '#d62839' : '#e5566b', (c) => ellipse(c, Math.cos(a) * 0.035, 0.17 + Math.sin(a) * 0.03, 0.04, 0.026, a));
+    }
+    fill(ctx, '#f4d35e', (c) => ellipse(c, 0, 0.17, 0.015, 0.015));
+    for (let k = 0; k < 3; k++) stroke(ctx, k === 1 ? '#f4d35e' : '#d62839', 0.006, (c) => { c.moveTo(0.26 + k * 0.012, 0.13); c.lineTo(0.27 + k * 0.012, -0.12); });
+  } else if (h.kind === 'bai') {
+    // 风花雪月: white crest (snow), a crescent top (moon), embroidered flowers, a white tassel (wind).
+    fill(ctx, '#fbfaf7', (c) => smooth(c, [[-0.12, -0.01], [-0.13, 0.07], [-0.05, 0.1], [0.05, 0.1], [0.13, 0.07], [0.12, -0.01]], true, 0.3));
+    fill(ctx, '#fbfaf7', (c) => { c.moveTo(-0.12, 0.07); c.quadraticCurveTo(0, 0.28, 0.13, 0.07); c.quadraticCurveTo(0, 0.18, -0.12, 0.07); });
+    band(ctx, -0.13, 0.13, 0.03, 0.03, '#d62839', '#f7a1b5', 'diamond', '#fbfaf7');
+    flowers(ctx, -0.1, 0.05, 0.1, 0.09, ['#e5566b', '#f7a1b5'], 0.018, 21, 1.2);
+    for (let k = 0; k < 7; k++) stroke(ctx, '#fbfaf7', 0.006, (c) => { c.moveTo(-0.12, 0.02); c.lineTo(-0.15 - k * 0.006, -0.18 - (k % 3) * 0.02); });
+  } else if (h.kind === 'naxi') {
+    fill(ctx, '#23395b', (c) => smooth(c, [[-0.1, -0.01], [-0.1, 0.06], [0, 0.09], [0.1, 0.06], [0.1, -0.01]], true, 0.4));
+    band(ctx, -0.11, 0.11, 0.005, 0.016, '#23395b', '#e9c46a', 'dots');
+  } else if (h.kind === 'dong') {
+    // High bun with a silver comb, a silver flower crown and a side flower.
+    fill(ctx, HAIR, (c) => ellipse(c, 0, 0.07, 0.07, 0.06));
+    fill(ctx, '#e7eaee', (c) => smooth(c, [[-0.09, 0.03], [-0.07, 0.12], [0, 0.14], [0.07, 0.12], [0.09, 0.03], [0, 0.06]], true, 0.4));
+    for (let i = -3; i <= 3; i++) fill(ctx, '#ffffff', (c) => ellipse(c, i * 0.024, 0.11 - Math.abs(i) * 0.012, 0.01, 0.01));
+    for (let p = 0; p < 6; p++) {
+      const a = (p / 6) * Math.PI * 2;
+      fill(ctx, '#e5566b', (c) => ellipse(c, 0.1 + Math.cos(a) * 0.016, 0.06 + Math.sin(a) * 0.016, 0.014, 0.009, a));
+    }
+  } else if (h.kind === 'li') {
+    // Black head-cloth with a woven Li-brocade front band, knotted at the side.
+    const shape = (c) => smooth(c, [[-0.115, -0.01], [-0.12, 0.07], [0, 0.1], [0.12, 0.07], [0.115, -0.01]], true, 0.35);
+    fill(ctx, '#15110f', shape);
+    clipTo(ctx, shape, () => band(ctx, -0.14, 0.14, 0.025, 0.035, '#15110f', '#e63946', 'zigzag'));
+    fill(ctx, '#15110f', (c) => poly(c, [[0.1, 0.03], [0.17, 0.0], [0.16, -0.08], [0.12, -0.02]]));
+  } else if (h.kind === 'yiGirl') {
+    // Liangshan Yi: a broad black hat, banded red and yellow, silver at the brim.
+    fill(ctx, '#15110f', (c) => smooth(c, [[-0.16, 0.0], [-0.18, 0.09], [-0.1, 0.13], [0.1, 0.13], [0.18, 0.09], [0.16, 0.0]], true, 0.2));
+    band(ctx, -0.18, 0.18, 0.03, 0.022, '#c1121f', '#f4d35e', 'diamond');
+    band(ctx, -0.18, 0.18, 0.065, 0.014, '#f4d35e', '#c1121f', 'zigzag');
+    band(ctx, -0.18, 0.18, 0.1, 0.018, '#15110f', '#c1121f', 'cloud');
+    for (let i = -6; i <= 6; i++) fill(ctx, '#e7eaee', (c) => ellipse(c, i * 0.026, -0.004, 0.006, 0.006));
   }
 }
 
@@ -377,7 +446,7 @@ export function makePerson(spec) {
     { name: 'head', parent: 'torso', pin: [0, 0.485], z: 0.008 },
     { name: 'backhair', parent: 'head', pin: [0, 0.14], z: -0.03, bounds: [-0.14, -0.7, 0.14, 0.4], draw: (c) => drawBackHair(c, s), px: d * 1.2, skip: !['braids', 'bun', 'long'].includes(s.hair) },
     { name: 'face', parent: 'head', pin: [0, 0], z: 0, bounds: [-0.14, -0.07, 0.14, 0.32], draw: (c) => drawHead(c, s), px: d * 2.2 },
-    { name: 'hat', parent: 'head', pin: [0, 0.225], z: 0.004, bounds: [-0.36, -0.08, 0.36, 0.36], draw: (c) => drawHat(c, s), px: d * 1.6, skip: !s.hat },
+    { name: 'hat', parent: 'head', pin: [0, 0.225], z: 0.004, bounds: [-0.36, s.hat?.low ? -0.32 : -0.08, 0.36, 0.4], draw: (c) => drawHat(c, s), px: d * 1.6, skip: !s.hat },
     { name: 'shoulderA', parent: 'torso', pin: [-0.155, 0.405], z: 0.012, bounds: [-0.08, -0.32, 0.08, 0.06], draw: (c) => drawUpperArm(c, s, 0), px: d },
     { name: 'elbowA', parent: 'shoulderA', pin: [0, -0.28], z: 0.002, bounds: [-0.1, -0.3 - (s.sleeve?.long ?? 0) - 0.02, 0.1, 0.05], draw: (c) => drawForearm(c, s, 0), px: d },
     { name: 'wristA', parent: 'elbowA', pin: [0, -0.255 - (s.sleeve?.long ?? 0) * 0.3], z: -0.001, bounds: [-0.08, -0.12, 0.08, 0.03], draw: (c) => drawHand(c, s, -1, s.handPose), px: d * 1.3 },
@@ -476,6 +545,111 @@ export const PEOPLE = {
     pants: { color: '#14142b', boots: '#14142b' },
     necklace: 'silver', earrings: '#e7eaee', ...o,
   }),
+  zhuangGirl: (o = {}) => ({
+    hair: 'long', look: 0.2, smile: 0.012, earrings: '#e7eaee',
+    hat: { kind: 'zhuang', low: true },
+    top: { color: '#1d2b53', pattern: 'embroidered', colors: ['#1d2b53', '#c1121f', '#f4d35e'], collar: '#c1121f' },
+    sleeve: { color: '#1d2b53', cuff: '#c1121f' },
+    skirt: { kind: 'pleated', color: '#1d2b53', width: 0.34, length: 0.85, pattern: 'pleats', hem: [['#c1121f', 0.04, 0.05, 'diamond', '#f4d35e', '#2a9d8f']] },
+    necklace: 'silver', bangles: '#e7eaee', ...o,
+  }),
+  koreanGirl: (o = {}) => ({
+    hair: 'long', look: -0.25, smile: 0.012,
+    hat: { kind: 'korean' },
+    top: { color: '#fbf6ea', collar: '#fbfaf7', sash: '#c1121f' },
+    sleeve: { color: '#fbf6ea', pattern: 'stripes', colors: ['#e63946', '#f4a261', '#f4d35e', '#2a9d8f', '#3a86ff', '#8338ec', '#fbf6ea'], cuff: '#1d3557' },
+    skirt: { kind: 'flare', color: '#d62839', width: 0.46, length: 0.98 },
+    ...o,
+  }),
+  yiGirl: (o = {}) => ({
+    hair: 'long', look: 0.15, smile: 0.01, earrings: '#e7eaee',
+    hat: { kind: 'yiGirl' },
+    top: { color: '#15110f', pattern: 'embroidered', colors: ['#15110f', '#c1121f', '#f4d35e'], collar: '#c1121f' },
+    sleeve: { color: '#15110f', pattern: 'stripes', colors: ['#15110f', '#15110f', '#c1121f', '#f4d35e'] },
+    skirt: { kind: 'pleated', color: '#15110f', width: 0.42, length: 0.92, pattern: 'pleats', hem: [['#c1121f', 0.05, 0.06, 'zigzag', '#f4d35e'], ['#f4d35e', 0.18, 0.05, 'diamond', '#15110f', '#c1121f'], ['#2a6f97', 0.32, 0.05, 'cross', '#f4d35e']] },
+    necklace: 'silver', ...o,
+  }),
+  haniGirl: (o = {}) => ({
+    hair: 'long', look: 0.3, smile: 0.012,
+    hat: { kind: 'hani', low: true },
+    top: { color: '#1b2440', pattern: 'embroidered', colors: ['#1b2440', '#e63946', '#e7eaee'], collar: '#e7eaee' },
+    sleeve: { color: '#1b2440', pattern: 'stripes', colors: ['#1b2440', '#1b2440', '#1b2440', '#e63946', '#f4d35e', '#2a9d8f'] },
+    skirt: { kind: 'tube', color: '#1b2440', length: 0.6 },
+    pants: { color: '#1b2440', boots: '#1b2440' },
+    necklace: 'silver', ...o,
+  }),
+  kazakhMan: (o = {}) => ({
+    hair: 'short', look: -0.3,
+    hat: { kind: 'kazakh' },
+    top: { color: '#3b2a4f', robeCross: true, trim: '#c98b4a', sash: '#b0412e' },
+    sleeve: { color: '#3b2a4f', cuff: '#c98b4a' },
+    pants: { color: '#2a1f35', boots: '#3b2314' },
+    ...o,
+  }),
+  huiMan: (o = {}) => ({
+    hair: 'short', look: 0.2, smile: 0.01,
+    hat: { kind: 'cap' },
+    top: { color: '#fbfaf7', vest: '#15110f', vestTrim: '#15110f' },
+    sleeve: { color: '#fbfaf7' },
+    pants: { color: '#15110f', boots: '#15110f' },
+    ...o,
+  }),
+  manchuGirl: (o = {}) => ({
+    hair: 'bun', look: -0.15, smile: 0.008, earrings: '#e7eaee',
+    hat: { kind: 'manchu', low: true },
+    top: { color: '#2a6f97', robeCross: true, trim: '#f4d35e', collar: '#f4d35e' },
+    sleeve: { color: '#2a6f97', cuff: '#fbfaf7', long: 0.04 },
+    skirt: { kind: 'tube', color: '#2a6f97', length: 0.95, hem: [['#f4d35e', 0.05, 0.05, 'cloud', '#2a6f97']] },
+    ...o,
+  }),
+  baiGirl: (o = {}) => ({
+    hair: 'long', look: 0.25, smile: 0.012, earrings: '#e7eaee',
+    hat: { kind: 'bai', low: true },
+    top: { color: '#fbfaf7', vest: '#c1121f', vestTrim: '#f7a1b5', collar: '#c1121f' },
+    sleeve: { color: '#fbfaf7', cuff: '#2a6f97' },
+    skirt: { kind: 'tube', color: '#2a6f97', length: 0.7, hem: [['#fbfaf7', 0.35, 0.3, 'dots', '#f7a1b5']] },
+    pants: { color: '#fbfaf7', boots: '#c1121f' },
+    ...o,
+  }),
+  naxiGirl: (o = {}) => ({
+    hair: 'long', look: -0.2, smile: 0.01,
+    hat: { kind: 'naxi' },
+    top: { color: '#2a6f97', vest: '#7a1f2b', vestTrim: '#e9c46a' },
+    sleeve: { color: '#2a6f97', cuff: '#e9c46a' },
+    skirt: { kind: 'pleated', color: '#1b2440', width: 0.34, length: 0.9, pattern: 'pleats', apron: ['#fbfaf7', '#f1ece0'] },
+    ...o,
+  }),
+  dongGirl: (o = {}) => ({
+    hair: 'bun', look: 0.1, smile: 0.012, earrings: '#e7eaee',
+    hat: { kind: 'dong' },
+    top: { color: '#3a2f4a', pattern: 'embroidered', colors: ['#3a2f4a', '#e5566b', '#2a9d8f'], collar: '#e7eaee' },
+    sleeve: { color: '#3a2f4a', cuff: '#e5566b' },
+    skirt: { kind: 'pleated', color: '#2a2438', width: 0.34, length: 0.55, pattern: 'pleats' },
+    pants: { color: '#2a2438', boots: '#2a2438' },
+    necklace: 'silver', ...o,
+  }),
+  liGirl: (o = {}) => ({
+    hair: 'long', look: 0.25, smile: 0.012,
+    hat: { kind: 'li' },
+    top: { color: '#15110f', collar: '#e63946', pattern: 'embroidered', colors: ['#15110f', '#e63946', '#f4d35e'] },
+    sleeve: { color: '#15110f', cuff: '#e63946' },
+    skirt: { kind: 'tube', color: '#15110f', length: 0.75, pattern: 'brocade', colors: ['#15110f', '#e63946', '#f4d35e', '#2a9d8f'] },
+    ...o,
+  }),
+  hanGirl: (o = {}) => ({
+    hair: 'bun', look: 0.1, smile: 0.012, earrings: '#d4a24c',
+    top: { color: '#c1121f', collar: '#d4a24c', pattern: 'embroidered', colors: ['#c1121f', '#d4a24c', '#f6e3b0'] },
+    sleeve: { color: '#c1121f', cuff: '#d4a24c' },
+    skirt: { kind: 'tube', color: '#1d3557', length: 0.9, hem: [['#d4a24c', 0.05, 0.04, 'cloud', '#1d3557']] },
+    ...o,
+  }),
+  hanBoy: (o = {}) => ({
+    hair: 'short', look: -0.1, smile: 0.012,
+    top: { color: '#fbfaf7', collar: '#1d3557', sash: '#c1121f' },
+    sleeve: { color: '#fbfaf7' },
+    pants: { color: '#1d3557', boots: '#15110f' },
+    ...o,
+  }),
   daiGirl: (o = {}) => ({
     hair: 'short', look: -0.3, smile: 0.008, handPose: 'peacock',
     hat: { kind: 'dai' },
@@ -485,5 +659,15 @@ export const PEOPLE = {
     bangles: '#d4a24c', ...o,
   }),
 };
+
+/** Clone a puppet cheaply (shares textures and geometry) and rebuild its joint map. */
+export function clonePerson(pup) {
+  const root = pup.root.clone();
+  const j = { root };
+  root.traverse((o) => {
+    if (o.name && !(o.name in j)) j[o.name] = o;
+  });
+  return { root, j, cards: pup.cards, spec: pup.spec };
+}
 
 export { rng };

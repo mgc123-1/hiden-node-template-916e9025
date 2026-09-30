@@ -132,6 +132,25 @@ export function profileNoise(x0, x1, n, base, amp, seed, sharp = 0.6) {
   return pts;
 }
 
+/** Guangxi/Guizhou karst: a row of round-shouldered tower peaks on one card. */
+export function karst(seed, n, w, h, col) {
+  const r = rng(seed);
+  const pts = [[-w / 2, 0]];
+  for (let i = 0; i < n; i++) {
+    const cx = -w / 2 + (w * (i + 0.5)) / n + (r() - 0.5) * (w / n) * 0.4;
+    const hw = (w / n) * (0.3 + r() * 0.25);
+    const hh = h * (0.55 + r() * 0.45);
+    pts.push([cx - hw, h * 0.08], [cx - hw * 0.8, hh * 0.7], [cx - hw * 0.35, hh], [cx + hw * 0.35, hh], [cx + hw * 0.8, hh * 0.7], [cx + hw, h * 0.08]);
+  }
+  pts.push([w / 2, 0]);
+  return card({
+    bounds: [-w / 2, 0, w / 2, h + 1],
+    px: 3,
+    bevel: 0.6,
+    draw: (ctx) => fill(ctx, col, (c) => smooth(c, pts, true, 0.35)),
+  });
+}
+
 // ─── Turpan ─────────────────────────────────────────────────────────────────
 
 export function grapeLeafCard(seed, size = 0.22, green = '#3f7d3a') {
