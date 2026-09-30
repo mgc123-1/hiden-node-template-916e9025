@@ -21,6 +21,18 @@
   try {
     await boot(canvas);
     window.ready = true;
+    const q = new URLSearchParams(location.search);
+    if (q.has('play')) {
+      // Real-time playback, locked to the soundtrack's clock.
+      const audio = new Audio('../dist/soundtrack.m4a');
+      audio.currentTime = Number(q.get('t') || 0);
+      const tick = () => {
+        window.renderFrame(Math.min(29.99, audio.currentTime));
+        if (!audio.ended) requestAnimationFrame(tick);
+      };
+      window.renderFrame(audio.currentTime);
+      document.body.addEventListener('click', () => { audio.currentTime = audio.ended ? 0 : audio.currentTime; audio.play(); requestAnimationFrame(tick); });
+    }
   } catch (e) {
     window.bootError = String(e && e.stack || e);
     console.error(e);
