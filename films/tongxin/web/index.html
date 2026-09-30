@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>同心结 · Tongxin Knot</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; background: #0f0c0a; }
+  canvas { display: block; width: 100vw; max-width: calc(100vh * 16 / 9); margin: 0 auto; aspect-ratio: 16 / 9; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+  import { boot } from '../src/main.js';
+  const canvas = document.getElementById('c');
+  window.bootError = null;
+  try {
+    await boot(canvas);
+    window.ready = true;
+  } catch (e) {
+    window.bootError = String(e && e.stack || e);
+    console.error(e);
+  }
+</script>
+</body>
+</html>

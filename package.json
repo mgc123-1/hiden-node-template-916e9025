@@ -1,19 +1,21 @@
 {
-  "name": "jingwei-national-day-2026",
+  "name": "national-day-films",
   "version": "1.0.0",
-  "description": "经纬 · Warp & Weft — a 30-second motion design film for National Day 2026",
+  "description": "National Day motion films — 经纬 (2026) and 同心结 (2026)",
   "type": "module",
   "private": true,
   "scripts": {
-    "audio": "node scripts/render-audio.js",
-    "video": "node scripts/render-video.js",
-    "stills": "node scripts/render-stills.js",
-    "qa:audio": "node scripts/qa-audio.js",
-    "build": "node scripts/render-audio.js && node scripts/render-video.js",
-    "preview": "node scripts/serve.js"
+    "jingwei:audio": "node films/jingwei/scripts/render-audio.js",
+    "jingwei:video": "node films/jingwei/scripts/render-video.js",
+    "tongxin:audio": "node films/tongxin/scripts/render-audio.js",
+    "tongxin:video": "node films/tongxin/scripts/render-video.js",
+    "tongxin:stills": "node films/tongxin/scripts/render-stills.js",
+    "tongxin:preview": "node films/tongxin/scripts/serve.js"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@napi-rs/canvas": "^0.1.80"
+    "@napi-rs/canvas": "^0.1.80",
+    "playwright-core": "1.56",
+    "three": "^0.170.0"
   }
 }
