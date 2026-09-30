@@ -18,7 +18,7 @@ import { card } from '../engine/paper.js';
 import { Ribbon, silkMaterial } from '../engine/silk.js';
 import { handWorld } from '../engine/fk.js';
 
-export const T0 = at(10) - 0.12;
+export const T0 = at(10) - 0.02;
 export const END = at(14);
 const FLASH0 = at(12);
 const QUILT0 = at(13);

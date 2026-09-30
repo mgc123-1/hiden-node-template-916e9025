@@ -18,7 +18,7 @@ import { chase } from '../engine/chase.js';
 import { fill, poly, smooth, stroke, ellipse } from '../art/draw.js';
 
 export const T0 = at(8) - 0.18;
-export const CUT = at(10) - 0.12;
+export const CUT = at(10) - 0.02;
 // Speed ramp: story time slows while the silk passes the silver crown.
 const RAMP0 = at(8, 1);
 const RAMP1 = at(8, 2, 2);
@@ -141,17 +141,27 @@ export function createSouth(env) {
   cliff.position.set(0, 0, -8.8);
   g.add(cliff);
   // Waterfall: translucent strips sliding down (and the rain we arrive through).
-  const fallProto = card({ bounds: [-0.05, -0.8, 0.05, 0.8], px: 160, glowThrough: 0.6, cast: false, draw: (ctx) => fill(ctx, '#eef6f6', (c) => poly(c, [[-0.05, -0.8], [0.05, -0.8], [0.05, 0.8], [-0.05, 0.8]])) });
+  // Waterfall: slips of translucent paper in three tones, tapered, sliding down.
+  const fallProtos = ['#f4f9f8', '#d8ecea', '#bcdcd8'].map((col) => card({ bounds: [-0.035, -0.9, 0.035, 0.9], px: 220, bevel: 0.4, glowThrough: 0.45, cast: false, draw: (ctx) => fill(ctx, col, (c) => poly(c, [[0, -0.9], [0.035, -0.6], [0.03, 0.7], [0, 0.9], [-0.03, 0.7], [-0.035, -0.6]])) }));
   const falls = [];
-  for (let i = 0; i < 260; i++) {
-    const m = fallProto.clone();
+  for (let i = 0; i < 230; i++) {
+    const m = fallProtos[i % 3].clone();
+    m.scale.set(0.5 + r() * 1.2, 0.8 + r() * 0.6, 1);
     g.add(m);
     falls.push({ m, x: -2.1 + r() * 4.2, y: r(), z: -8.4 + r() * 0.5, v: 0.9 + r() * 0.5 });
   }
+  // Foam where the fall meets the pool: a scalloped rim of white paper.
+  const foam = card({ bounds: [-2.8, -0.2, 2.8, 0.7], px: 120, glowThrough: 0.3, draw: (ctx) => {
+    fill(ctx, '#e9f4f2', (c) => { c.moveTo(-2.8, -0.2); for (let x = -2.8; x <= 2.8; x += 0.28) c.quadraticCurveTo(x + 0.14, 0.55 + 0.15 * Math.sin(x * 7), x + 0.28, 0.15); c.lineTo(2.8, -0.2); c.closePath(); });
+    fill(ctx, '#ffffff', (c) => { c.moveTo(-2.4, -0.2); for (let x = -2.4; x <= 2.4; x += 0.22) c.quadraticCurveTo(x + 0.11, 0.35 + 0.1 * Math.sin(x * 9), x + 0.22, 0.05); c.lineTo(2.4, -0.2); c.closePath(); });
+  } });
+  foam.position.set(0, 0.25, -7.9);
+  g.add(foam);
+  const rainProto = card({ bounds: [-0.01, -1.2, 0.01, 1.2], px: 260, bevel: 0.3, glowThrough: 0.25, cast: false, draw: (ctx) => fill(ctx, '#c3cdd6', (c) => poly(c, [[0, -1.2], [0.01, -0.9], [0.01, 0.9], [0, 1.2], [-0.01, 0.9], [-0.01, -0.9]])) });
   const rain = [];
   for (let i = 0; i < 420; i++) {
-    const m = fallProto.clone();
-    m.scale.set(0.3, 1.4, 1);
+    const m = rainProto.clone();
+    m.scale.set(1.5, 0.7, 1);
     g.add(m);
     rain.push({ m, x: r(), y: r(), z: r(), v: 0.8 + r() * 0.6 });
   }

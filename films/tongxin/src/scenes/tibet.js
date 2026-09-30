@@ -388,10 +388,14 @@ export function createTibet(env) {
     }
     const wipe = prog(t, 9.0, 9.26, ease.inCubic);
     if (wipe > 0) {
+      // Keep the heading; slide up to the silk until it fills the lens.
       const b = bodyPt(1.3, t);
-      const into = [b[0] + 0.12, b[1] + 0.05, b[2] + 0.2];
+      const d = look.map((v, i) => v - pos[i]);
+      const dl = Math.hypot(...d) || 1;
+      const into = b.map((v, i) => v - (d[i] / dl) * 0.16);
+      const ahead = b.map((v, i) => v + (d[i] / dl) * 6);
       pos = pos.map((v, i) => lerp(v, into[i], wipe));
-      look = look.map((v, i) => lerp(v, b[i], wipe));
+      look = look.map((v, i) => lerp(v, ahead[i], wipe));
     }
     const focus = k > 0.5 ? dist(pos, [0, 1.5, 0]) : dist(pos, h);
     return { pos, look: look.map((v, i) => lerp(v, [0, 1.48, 0][i], k * 0.4)), fov: lerp(46, 32, k), dof: { focus, aperture: lerp(0.005, 0.016, k), maxBlur: 18 } };

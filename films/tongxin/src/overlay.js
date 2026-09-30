@@ -16,11 +16,11 @@ const INK = '#2a1c16';
 const SILK = '#a3081c';
 
 const CAPTIONS = [
-  [0.7, 3.45, '维吾尔族', '吐鲁番', 'UYGHUR — TURPAN, XINJIANG'],
-  [4.35, 7.2, '藏族', '圣湖', 'TIBETAN — THE SACRED LAKE, XIZANG'],
-  [8.25, 11.0, '蒙古族', '呼伦贝尔', 'MONGOL — HULUNBUIR, INNER MONGOLIA'],
-  [12.95, 14.25, '苗族', '黔东南', 'MIAO — QIANDONGNAN, GUIZHOU'],
-  [14.45, 15.75, '傣族', '西双版纳', 'DAI — XISHUANGBANNA, YUNNAN'],
+  [0.7, 3.5, '维吾尔族', '吐鲁番', 'UYGHUR — TURPAN, XINJIANG'],
+  [5.95, 8.75, '藏族', '圣湖', 'TIBETAN — THE SACRED LAKE, XIZANG'],
+  [9.75, 12.35, '蒙古族', '呼伦贝尔', 'MONGOL — HULUNBUIR, INNER MONGOLIA'],
+  [13.3, 14.45, '苗族', '黔东南', 'MIAO — QIANDONGNAN, GUIZHOU'],
+  [14.6, 15.75, '傣族', '西双版纳', 'DAI — XISHUANGBANNA, YUNNAN'],
   [15.85, 16.6, '大熊猫', '成都', 'GIANT PANDA — CHENGDU, SICHUAN'],
 ];
 
@@ -200,23 +200,20 @@ function endCard(ctx, t) {
     ctx.scale(s, s);
     ctx.rotate(-0.04);
     ctx.globalAlpha = 0.92 * sa;
+    // A slightly irregular square of cinnabar, the characters cut out of it.
     ctx.fillStyle = '#b3101f';
-    ctx.fillRect(-34, -34, 68, 68);
-    ctx.fillStyle = '#e9e1d2';
+    ctx.beginPath();
+    const edge = [[-34, -34], [-11, -35], [12, -33.5], [34, -34.5], [35, -12], [33.5, 11], [34.5, 34], [12, 35], [-10, 33.6], [-34.5, 34.4], [-33.4, 12], [-35, -10]];
+    edge.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)));
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalCompositeOperation = 'destination-out';
     ctx.font = '900 27px NotoSerifSC-900';
     if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
     ctx.textAlign = 'center';
     ctx.fillText('同', 0, -4);
     ctx.fillText('心', 0, 26);
-    // Worn edges of the stamp.
-    ctx.globalCompositeOperation = 'destination-out';
-    for (let i = 0; i < 40; i++) {
-      const a = (i * 2.399) % (Math.PI * 2);
-      const rr = 30 + ((i * 7) % 5);
-      ctx.beginPath();
-      ctx.arc(Math.cos(a) * rr, Math.sin(a) * rr, 1 + (i % 3), 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.globalCompositeOperation = 'source-over';
     ctx.restore();
   }
   // Colophon, right-aligned to the print.

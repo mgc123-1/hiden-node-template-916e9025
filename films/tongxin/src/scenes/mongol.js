@@ -124,6 +124,22 @@ export function createMongol(env) {
       ctx.ellipse(-600 + r() * 1200, -200 + r() * 400, 2 + r() * 6, 0.6 + r() * 1.5, 0, 0, TAU);
       ctx.fill();
     }
+    // Wind-combed bands, and the shadows of the cumulus drifting over.
+    for (let i = 0; i < 60; i++) {
+      ctx.fillStyle = i % 2 ? 'rgba(160,200,100,0.35)' : 'rgba(80,120,40,0.25)';
+      const y = -200 + r() * 400;
+      ctx.beginPath();
+      ctx.ellipse(-600 + r() * 1200, y, 30 + r() * 80, 1.5 + r() * 3, 0, 0, TAU);
+      ctx.fill();
+    }
+    for (let i = 0; i < 26; i++) {
+      ctx.fillStyle = 'rgba(40,70,40,0.22)';
+      ctx.beginPath();
+      const cx = -600 + r() * 1200;
+      const cy = -200 + r() * 260;
+      for (let k = 0; k < 5; k++) ctx.ellipse(cx + (k - 2) * 9 + r() * 4, cy + r() * 4, 10 + r() * 8, 5 + r() * 4, 0, 0, TAU);
+      ctx.fill();
+    }
     for (let i = 0; i < 700; i++) {
       ctx.fillStyle = ['#f4d35e', '#ffffff', '#e76f51', '#b5179e'][i % 4];
       ctx.beginPath();
@@ -132,15 +148,15 @@ export function createMongol(env) {
     }
   }, 3));
   // Rolling hills, lightening with distance.
-  const hillCols = ['#6ea23f', '#86b852', '#9dc86b', '#b6d48b'];
+  const hillCols = ['#5f9636', '#79ad48', '#93c064', '#aecd85', '#c3d9a6'];
   hillCols.forEach((col, k) => {
-    const z = -40 - k * 70;
+    const z = -28 - k * 55;
     const pts = [];
-    for (let i = 0; i <= 40; i++) {
-      const x = -700 + i * 40;
-      pts.push([x, 8 + k * 7 + 8 * Math.sin(i * 0.45 + k) + 4 * Math.sin(i * 1.3 + k * 2)]);
+    for (let i = 0; i <= 60; i++) {
+      const x = -700 + i * (1400 / 60);
+      pts.push([x, 7 + k * 6 + 7 * Math.sin(i * 0.35 + k * 1.7) + 3.5 * Math.sin(i * 0.9 + k * 2)]);
     }
-    const hill = ridge(pts, 0, col, { px: 2, bevel: 0.5 });
+    const hill = ridge(pts, 0, col, { px: 3, bevel: 1, maxTex: 4096 });
     hill.position.set(0, -2, z);
     g.add(hill);
   });
@@ -153,8 +169,9 @@ export function createMongol(env) {
   // Big summer cumulus, in layers.
   const clouds = [];
   for (let i = 0; i < 14; i++) {
-    const c = cloud(70 + r() * 60, 26 + r() * 14, 900 + i, ['#ffffff', '#eef3f8', '#dde7f1']);
-    c.position.set(-250 + i * 70 + r() * 30, 30 + r() * 35, -220 - r() * 140);
+    const c = cloud(70 + r() * 60, 26 + r() * 14, 900 + i, ['#ffffff', '#eef3f8', '#d6e2ee']);
+    c.position.set(-250 + i * 70 + r() * 30, 34 + r() * 30, -150 - r() * 120);
+    c.scale.setScalar(1.2 + r() * 0.5);
     g.add(c);
     clouds.push(c);
   }
@@ -257,7 +274,8 @@ export function createMongol(env) {
 
   // Rain curtain: translucent paper strips that close the frame.
   const rain = new THREE.Group();
-  const stripProto = card({ bounds: [-0.012, -1.2, 0.012, 1.2], px: 200, glowThrough: 0.4, cast: false, draw: (ctx) => fill(ctx, 'rgba(236,240,244,0.95)', (c) => poly(c, [[-0.012, -1.2], [0.012, -1.2], [0.012, 1.2], [-0.012, 1.2]])) });
+  // Paper rain: thin blue-grey slips, tapered at both ends.
+  const stripProto = card({ bounds: [-0.01, -1.2, 0.01, 1.2], px: 260, bevel: 0.3, glowThrough: 0.25, cast: false, draw: (ctx) => fill(ctx, '#c3cdd6', (c) => poly(c, [[0, -1.2], [0.01, -0.9], [0.01, 0.9], [0, 1.2], [-0.01, 0.9], [-0.01, -0.9]])) });
   const strips = [];
   for (let i = 0; i < 700; i++) {
     const m = stripProto.clone();

@@ -230,8 +230,9 @@ export function createBeijing(env) {
   const C = new THREE.Vector3(0, 68, -72);
   const mats = ['#a3081c', '#b3101f', '#920a1d'].map((c) => silkMaterial(c, 40, 0.8));
   const order = [0, 4, 1, 5, 2, 6, 3, 7];
-  const cam0 = new THREE.Vector3(0, 34, 11);
-  const f0 = C.clone().sub(cam0).normalize();
+  const cam0 = new THREE.Vector3(0, 12, 34);
+  const look0 = new THREE.Vector3(0, 40, -72);
+  const f0 = look0.clone().sub(cam0).normalize();
   const r0 = new THREE.Vector3().crossVectors(f0, new THREE.Vector3(0, 1, 0)).normalize();
   const u0 = new THREE.Vector3().crossVectors(r0, f0);
   const lensPt = (xs, ys, d) => cam0.clone().addScaledVector(f0, d).addScaledVector(r0, xs * d * TANH * ASP).addScaledVector(u0, ys * d * TANH).sub(C);
@@ -277,14 +278,21 @@ export function createBeijing(env) {
         path,
         sHead(tt) {
           if (tt < B0 + 0.04) return sAcross;
-          if (tt < tStart) return lerp(sAcross, sEntry, ease.inOutCubic(clamp((tt - B0 - 0.04) / (tStart - B0 - 0.04))));
+          // The curtain slides off the lens within a few frames, then the long flight.
+          if (tt < tStart) return sAcross + 4 * ease.inQuad(clamp((tt - B0 - 0.04) / 0.14)) + (sEntry - sAcross - 4) * ease.inOutCubic(clamp((tt - B0 - 0.04) / (tStart - B0 - 0.04)));
           return lerp(sEntry, path.len, ease.outQuad(clamp((tt - tStart) / (tEnd - tStart))) * 0.25 + clamp((tt - tStart) / (tEnd - tStart)) * 0.75);
         },
       };
       silk.rib = new Ribbon({
         curve: (u, t) => {
           const tt = knotTime(t);
-          path.at(silk.sHead(tt) - u * L, out);
+          const sh = silk.sHead(tt);
+          // In flight the thread is shorter — its tail follows the head off the
+          // lens — and it pays out to full length as it weaves.
+          const phi = 0.8 * clamp((tt - B0 - 0.04) / 0.06) * (1 - clamp((tt - tStart) / (tEnd - tStart)));
+          const floor = sAcross * 0 + (sh - sAcross) * phi + sAcross * (phi > 0 ? 1 : 0);
+          const body = Math.min(L, Math.max(0.01, sh - Math.max(0, floor)));
+          path.at(sh - u * (tt < B0 + 0.04 ? L : body), out);
           return toWorld(out, t);
         },
         length: L,
@@ -294,6 +302,7 @@ export function createBeijing(env) {
         wave: { amp: 0 },
         twist: { base: 0, perLen: 0, amp: 0.12, len: 6, freq: 0.6 },
       });
+      silk.rib.mesh.castShadow = false;
       g.add(silk.rib.mesh);
       silks.push(silk);
     }
@@ -334,6 +343,7 @@ export function createBeijing(env) {
       wave: { amp: 0 },
       twist: { base: ph, perLen: 0.2, amp: 0.4, len: 4, freq: 0.5 },
     });
+    rib.mesh.castShadow = false;
     g.add(rib.mesh);
     strands.push(rib);
   }
@@ -409,7 +419,8 @@ export function createBeijing(env) {
   // ── Update ─────────────────────────────────────────────────────────────
   const target = new THREE.Vector3();
   const camK = keys([
-    [B0, [0, 34, 11, 0, 68, -72, 40]],
+    [B0, [0, 12, 34, 0, 40, -72, 40]],
+    [B0 + 0.55, [0, 22, 14, 0, 58, -72, 40], ease.inOutSine],
     [SIL0, [0, 42.5, -15, 0, 67, -72, 40], ease.inOutSine],
     [HIT, [0, 44.5, -21, 0, 66.5, -72, 40], ease.linear],
     [HIT + 0.35, [0, 42, -11, 0, 64, -72, 42], ease.outCubic],
@@ -418,6 +429,9 @@ export function createBeijing(env) {
   function update(t) {
     const T = Math.min(t, FREEZE);
     const kt = knotTime(T);
+    // Close to the lens the satin weave would shimmer; let it in as the threads recede.
+    const weave = lerp(0.08, 0.35, prog(T, B0 + 0.1, B0 + 0.45));
+    for (const m of mats) m.normalScale.set(weave, weave);
     for (const s of silks) s.rib.update(T);
     // Medallion: struck in on the downbeat.
     const k = tight(T);
