@@ -22,7 +22,7 @@
 
 | 数据 | 内容 | 来源 |
 |---|---|---|
-| BTC 5m 成交带 | 2026-09-05 → 10-04，8,640 个市场，12,945,874 笔 taker 成交（data-api 原始字段，钱包已脱敏）+ 币安 BTCUSDT 1 秒收盘价。已与 9 月 8 日 websocket 成交逐笔核对：方向一致率 99.99%，当日成交额差 6% 以内，市场结果 253/253 与官方一致 | [achillekrtf/polymarket-mm-backtest](https://github.com/achillekrtf/polymarket-mm-backtest) release v1（只用原始数据，没用其结论） |
+| BTC 5m 成交带 | 2026-09-05 → 10-04，8,640 个市场，12,945,874 笔 taker 成交（data-api 原始字段，钱包已脱敏）+ 币安 BTCUSDT 1 秒收盘价。已与 9 月 8 日 websocket 成交逐笔核对：方向一致率 99.99%，当日成交额相差约 6%，市场结果 253/253 与官方一致 | [achillekrtf/polymarket-mm-backtest](https://github.com/achillekrtf/polymarket-mm-backtest) release v1（只用原始数据，没用其结论） |
 | BTC 5m 全深度盘口 | 2026-09-08 一整天：book 快照、price_change、websocket 成交（毫秒）、Chainlink 瞬时价 / TWAP30 / TWAP60、每个市场的 strike 与官方结果 | [Ligengxin96/polymarket-data-samples](https://github.com/Ligengxin96/polymarket-data-samples)（SHA-256 已校验） |
 | BTC/ETH 5m+15m 盘口 | 2026-08-06 → 08-18，每秒一次顶档报价与挂单量，406 万行 | [gensx-x1/polymarket-btc-eth-updown-data](https://github.com/gensx-x1/polymarket-btc-eth-updown-data) |
 | BTC 长历史结果 | 5m：5.4 万个（2025-12 → 2026-07）；15m：2.9 万；1h：9,600（2025-06 起）；含开盘前 1/5 分钟中间价 | [supervik/polymarket-btc-preopen](https://github.com/supervik/polymarket-btc-preopen) |
